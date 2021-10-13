@@ -1,0 +1,180 @@
+
+
+
+<div class="card mb-2">
+  <div class="card-header text-center">Customer Information</div>
+  <div class="card-body">
+    <div class="row">
+      <div class="col-4">
+        <fieldset class="form-group border p-3">
+          <legend class="w-auto">Customer List</legend>
+          <div class="card text-center mb-1 upper-hover" *ngFor="let c of customers" (click)="loadById(c.ID)">
+            <div class="card-body">
+              <h5 class="card-title custom-link-pointer">{{c.CustomerName}}</h5>
+            </div>
+          </div>
+        </fieldset>
+      </div>
+      <div class="col-8">
+        <fieldset class="form-group border p-3">
+          <div class="row mb-1">
+            <div class="col-12">
+              <fieldset class="form-group border p-3">
+                <legend class="w-auto">Actions</legend>
+                <div class="row">
+                  <div class="col-12">
+                    <button class="btn btn-primary btn-flat" *ngIf="applicationState=='view'" (click)="editModeOpen()">Edit</button>
+                    &nbsp;
+                    <button class="btn btn-success btn-flat" (click)="onSave()" *ngIf="applicationState=='edit' || applicationState=='new'">Save</button>
+                    &nbsp;
+                    <button class="btn btn-danger btn-flat" (click)="deleteCustomer()" *ngIf="applicationState=='view'">Delete</button>
+                    &nbsp;
+                    <button class="btn btn-secondary btn-flat" (click)="resetForm()">Cancel</button>
+                  </div>
+                </div>
+              </fieldset>
+            </div>
+          </div>
+          <form [formGroup]="mainForm">
+            <div class="row mb-1">
+              <div class="col-12">
+                <fieldset class="form-group border p-3">
+                  <legend class="w-auto">Basic Informations</legend>
+                  <div class="row">
+                    <div class="col-8">
+                      <div class="form-group mb-1">
+                        <div class="row">
+                          <label class="control-label col-4">Name <span class="text-danger"> *</span></label>
+                          <div class="col-8">
+                            <input formControlName="CustomerName" class="form-control form-control-sm" />
+                            <span class="text-danger" *ngIf="mainForm.get('CustomerName').errors?.required && formSubmited">Please Provide Customer Name.</span>
+                            <span class="text-danger" *ngIf="mainForm.get('CustomerName').errors?.maxlength">Only 50 Charecters Are Allowed.</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="form-group mb-1">
+                        <div class="row">
+                          <label class="control-label col-4">Father Name</label>
+                          <div class="col-8">
+                            <input formControlName="FatherName" class="form-control form-control-sm" />
+                            <span class="text-danger" *ngIf="mainForm.get('FatherName').errors?.maxlength">Only 50 Charecters Are Allowed.</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="form-group mb-1">
+                        <div class="row">
+                          <label class="control-label col-4">Mother Name</label>
+                          <div class="col-8">
+                            <input formControlName="MotherName" class="form-control form-control-sm" />
+                            <span class="text-danger" *ngIf="mainForm.get('MotherName').errors?.maxlength">Only 50 Charecters Are Allowed.</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="form-group mb-1">
+                        <div class="row">
+                          <label class="control-label col-4">Marital Status</label>
+                          <div class="col-8">
+                            <div class="row">
+                              <div class="col-4">
+                                <input id="single" type="radio" name="MaritalStatus" formControlName="MaritalStatus" value="1" />
+                                <label for="single">SINGLE</label>
+                              </div>
+                              <div class="col-4">
+                                <input id="married" type="radio" name="MaritalStatus" formControlName="MaritalStatus" value="2" />
+                                <label for="married">MARRIED</label>
+                              </div>
+                              <div class="col-4">
+                                <input id="other" type="radio" name="MaritalStatus" formControlName="MaritalStatus" value="3" />
+                                <label for="other">OTHER</label>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="form-group mb-1">
+                        <div class="row">
+                          <label class="control-label col-4">Country <span class="text-danger"> *</span></label>
+                          <div class="col-8">
+                            <select class="form-control form-control-sm" formControlName="CountryID">
+                              <option disabled value="0">Select Country</option>
+                              <option *ngFor="let a of countries" value="{{a.ID}}">{{a.CountryName}}</option>
+                            </select>
+                            <span class="text-danger" *ngIf="(mainForm.get('CountryID').errors?.required ||mainForm.get('CountryID').value== 0)&& formSubmited">Please Select Country.</span>
+                          </div>
+                        </div>
+                      </div>
+                      <!--<div class="form-group mb-1">
+                        <div class="row">
+                          <label class="control-label col-4">Photo</label>
+                          <div class="col-8">
+
+
+                          </div>
+                        </div>
+                      </div>-->
+                    </div>
+                    <div class="col-4">
+                      <div class="fileUpload" *ngIf="!customerImageSelected">
+                        <div class="centerd text-center" (click)="onImageUploadClick($event)">
+                          <p class="text-center">Upload image</p>
+                        </div>
+                      </div>
+                      <div class="customer-image" *ngIf="customerImageSelected">
+                        <img [src]="customerPhotoUrl" alt="Customer Image" class="myImage" />
+                        <div class="middle">
+                          <button class="btn btn-dark" (click)="onImageUploadClick($event)" *ngIf="applicationState=='edit' || applicationState=='new'">
+                            Change Image
+                          </button>
+                        </div>
+                      </div>
+                      <span class="text-danger" *ngIf="(!customerImageSelected) && formSubmited">Please Upload Image.</span>
+                    </div>
+                  </div>
+                </fieldset>
+              </div>
+            </div>
+            <div class="row mb-1">
+              <div class="col-12">
+                <fieldset class="form-group border p-3">
+                  <legend class="w-auto">Other Informations</legend>
+                  <div class="row">
+                    <div class="col-12 mb-1">
+                      <button class="btn btn-primary btn-flat" *ngIf="applicationState=='edit' || applicationState=='new'" (click)="addCustomerAddresses()">Add</button>
+                    </div>
+                    <div class="col-12">
+                      <table class="table table-bordered table-striped">
+                        <thead>
+                          <tr>
+                            <th>Address</th>
+                            <th style="width:200px;"></th>
+                          </tr>
+                        </thead>
+                        <tbody formArrayName="CustomerAddresses">
+                          <tr *ngFor="let add of getCustomerAddresses().controls;let i=index">
+                            <td [formGroupName]="i">
+                              <input type="text" formControlName="Address" class="form-control form-control-sm" />
+                              <span class="text-danger" *ngIf="add.get('Address').errors?.required && formSubmited">Please Provide Address</span>
+                              <span class="text-danger" *ngIf="add.get('Address').errors?.maxlength">Address Can contain only 500 charecters</span>
+                            </td>
+                            <td>
+                              <button class="btn btn-primary btn-flat" *ngIf="applicationState=='edit' || applicationState=='new'" (click)="enableEditingAddress(i)">Edit</button> &nbsp;
+                              <button class="btn btn-danger btn-flat" *ngIf="applicationState=='edit' || applicationState=='new'" (click)="removeCustomerAddresses(i)">Delete</button>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </fieldset>
+              </div>
+            </div>
+          </form>
+        </fieldset>
+      </div>
+    </div>
+  </div>
+</div>
+
+<input type="file" id="imageInput" accept=".jpeg,.jpg,.png" class="invisible"
+       #attachedImageInput (change)="onImageSelected($event)">
+

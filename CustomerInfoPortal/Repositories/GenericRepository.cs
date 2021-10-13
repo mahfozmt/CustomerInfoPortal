@@ -1,6 +1,8 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace CustomerInfoPortal.Repositories
@@ -8,42 +10,43 @@ namespace CustomerInfoPortal.Repositories
     public class GenericRepository<T> : IRepositoryBase<T> where T : class
     {
         private readonly CIPDbContext _context;
-
-        public GenericRepository(CIPDbContext context)
+        private DbSet<T> table = null;
+        public GenericRepository(CIPDbContext DbContext)
         {
-            _context = context;
+            _context = DbContext;
+            table = _context.Set<T>();
         }
 
-        public void Add(T entity)
+        public void Save()
         {
-            _context.Set<T>().Add(entity);
+            _context.SaveChanges();
         }
 
-        public void Delete(T entity)
+        public void Create(T entity)
         {
-            _context.Set<T>().Remove(entity);
+            table.Add(entity);
         }
 
-        public IEnumerable<T> GetAll()
+        public void Delete(object id)
         {
-            return _context.Set<T>().ToList();
+            T existing = table.Find(id);
+            table.Remove(existing);
         }
 
-        public T GetById(object id)
+        public IQueryable<T> FindAll()
         {
-            return _context.Set<T>().Find(id);
+            return table.AsNoTracking();
         }
 
-        public async Task<T> SaveAsync(T entity)
+        public IQueryable<T> FindByCondition(Expression<Func<T, bool>> expression)
         {
-            await _context.SaveChangesAsync();
-            return entity;
-
+            return table.Where(expression).AsNoTracking();
         }
 
         public void Update(T entity)
         {
-            _context.Set<T>().Update(entity);
+            table.Attach(entity);
+            _context.Entry(entity).State = EntityState.Modified;
         }
     }
 }
