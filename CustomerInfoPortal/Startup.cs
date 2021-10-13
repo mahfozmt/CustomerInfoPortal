@@ -1,3 +1,4 @@
+using CustomerInfoPortal.Repositories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -6,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System;
 
 namespace CustomerInfoPortal
 {
@@ -30,6 +32,9 @@ namespace CustomerInfoPortal
             {
                 configuration.RootPath = "ClientApp/dist";
             });
+
+            services.AddScoped<ICustomerService, CustomerService>();
+            services.AddScoped(typeof(IRepositoryBase<>), typeof(GenericRepository<>));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -68,7 +73,8 @@ namespace CustomerInfoPortal
                 // see https://go.microsoft.com/fwlink/?linkid=864501
 
                 spa.Options.SourcePath = "ClientApp";
-
+                //Configure the timeout to 5 minutes to avoid "The Angular CLI process did not start listening for requests within the timeout period of 50 seconds." issue
+                spa.Options.StartupTimeout = new TimeSpan(0, 5, 0);
                 if (env.IsDevelopment())
                 {
                     spa.UseAngularCliServer(npmScript: "start");
