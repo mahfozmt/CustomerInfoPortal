@@ -5,6 +5,8 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { Country } from '../Models/Country';
 import { Customer } from '../Models/Customer';
 import { CustomerAddress } from '../Models/CustomerAddress';
+import { CountryService } from '../shared/services/country.service';
+import { CustomerService } from '../shared/services/customer.service';
 
 declare var $: any;
 
@@ -30,7 +32,7 @@ export class CustomerComponent implements OnInit {
     static: true
   }) attachedImageInput: ElementRef
 
-  constructor(private countryService: CountryService, private customerService: CustomerService, private fb: FormBuilder, private domSanitizer: DomSanitizer, private notify: NotificationService) { }
+  constructor(private countryService: CountryService, private customerService: CustomerService, private fb: FormBuilder, private domSanitizer: DomSanitizer) { }
 
   ngOnInit(): void {
     this.buildForm();
@@ -116,7 +118,7 @@ export class CustomerComponent implements OnInit {
   removeCustomerAddresses(i: number) {
     this.getCustomerAddresses().removeAt(i);
     if (i == 0) {
-      this.notify.showWarning('You Have To Provide At Least 1 Address', 'Warnings');
+      // this.notify.showWarning('You Have To Provide At Least 1 Address', 'Warnings');
       this.addCustomerAddresses();
     }
   }
@@ -152,18 +154,18 @@ export class CustomerComponent implements OnInit {
       });
       this.customerService.saveCustomer(fd).subscribe(
         (data) => {
-          this.notify.showSuccess('Information Saved Succesfully', 'Information');
+          // this.notify.showSuccess('Information Saved Succesfully', 'Information');
           console.log(data);
           this.resetForm();
         },
         (err) => {
-          this.notify.showError('Error Occered!', 'Oops');
+          // this.notify.showError('Error Occered!', 'Oops');
           console.log(err);
         }
       )
     }
     else {
-      this.notify.showWarning('Please Provide All Required Data.', 'Warning');
+      // this.notify.showWarning('Please Provide All Required Data.', 'Warning');
     }
 
   }
@@ -184,7 +186,7 @@ export class CustomerComponent implements OnInit {
     this.applicationState = 'view';
     this.customerService.getAllCustomerById(id).subscribe(
       (data) => {
-        this.notify.showInfo('Information Loaded Succesfully', 'Information');
+        // this.notify.showInfo('Information Loaded Succesfully', 'Information');
         console.log(data);
         this.mainForm.patchValue({
           ID: data.ID,
@@ -208,7 +210,7 @@ export class CustomerComponent implements OnInit {
         this.mainForm.disable();
       },
       (err) => {
-        this.notify.showError('Error Occered!', 'Oops');
+        // this.notify.showError('Error Occered!', 'Oops');
         console.log(err);
       }
     )
@@ -226,12 +228,12 @@ export class CustomerComponent implements OnInit {
         fd.append("ID", this.customerData.ID.toString());
         this.customerService.deleteCustomer(fd).subscribe(
           (data) => {
-            this.notify.showSuccess('Information Ddeleted Succesfully', 'Information');
+            // this.notify.showSuccess('Information Ddeleted Succesfully', 'Information');
             console.log(data);
             this.resetForm();
           },
           (err) => {
-            this.notify.showError('Error Occered!', 'Oops');
+            // this.notify.showError('Error Occered!', 'Oops');
             console.log(err);
           });
       }
