@@ -13,15 +13,15 @@ namespace CustomerInfoPortal.Repositories
 {
     public class CustomerService : ICustomerService
     {
-        public CustomerService( IRepositoryBase<Customer> CusRepository, IRepositoryBase<CustomerAddress> AddresRepository)
+        public CustomerService( IGenirecRepositoryBase<Customer> CusRepository, IGenirecRepositoryBase<CustomerAddress> AddresRepository)
         {
             
             _CustomerRepository = CusRepository;
             this._AddresRepository = AddresRepository;
         }
 
-        public IRepositoryBase<Customer> _CustomerRepository { get; }
-        public IRepositoryBase<CustomerAddress> _AddresRepository { get; }
+        public IGenirecRepositoryBase<Customer> _CustomerRepository { get; }
+        public IGenirecRepositoryBase<CustomerAddress> _AddresRepository { get; }
 
 
 
@@ -29,7 +29,7 @@ namespace CustomerInfoPortal.Repositories
         {
             try
             {
-                return _CustomerRepository.FindAll();
+                return _CustomerRepository.GetAll();
             }
             catch (Exception ex)
             {
@@ -43,8 +43,8 @@ namespace CustomerInfoPortal.Repositories
         {
             try
             {
-                Customer customer = _CustomerRepository.FindByCondition(x => x.ID == id).FirstOrDefault();
-                List<CustomerAddress> customerAddresses = _AddresRepository.FindByCondition(x => x.CustomerID == customer.ID).ToList();
+                Customer customer = _CustomerRepository.GetByExpresion(x => x.ID == id).FirstOrDefault();
+                List<CustomerAddress> customerAddresses = _AddresRepository.GetByExpresion(x => x.CustomerID == customer.ID).ToList();
                 customer.CustomerAddresses = customerAddresses;
                 return customer;
             }
@@ -54,7 +54,7 @@ namespace CustomerInfoPortal.Repositories
             }
         }
 
-        public Customer SaveCustomer(CustomerViewModel customerViewModel)
+        public Customer CreateCustomer(CustomerViewModel customerViewModel)
         {
             try
             {
@@ -66,54 +66,33 @@ namespace CustomerInfoPortal.Repositories
                     FatherName = customerViewModel.FatherName,
                     MotherName = customerViewModel.MotherName,
                     MaritalStatus = customerViewModel.MaritalStatus,
-                    CustomerPhoto= ConvertFileToByte(customerViewModel.CustomerPhoto),
+                    //CustomerPhoto= 
                     Country = customerViewModel.Country,
                     CustomerAddresses = customerViewModel.CustomerAddresses
                 };
+                    
+                byte[] PhotoByte = null;
+                if (customerViewModel.CustomerPhoto != null)
+                {
+                    if (customerViewModel.CustomerPhoto.Length > 0)
+                    {
+                        using (var ms = new MemoryStream())
+                        {
+                            customerViewModel.CustomerPhoto.CopyTo(ms);
+                            PhotoByte = ms.ToArray();
+                        }
+                    }
+                }
+                customerData.CustomerPhoto = PhotoByte;
+
 
                 if (customerData.ID > 0)
                 {
-                    List<CustomerAddress> needUpdated = new List<CustomerAddress>();
-                    foreach (var item in customerData.CustomerAddresses)
-                    {
-                        needUpdated.Add(item);
-                    }
+                    CustomerAddressesSynchronizer(customerData);
 
-                    List<CustomerAddress> fr = CustomerAddressSynch(customerData.CustomerAddresses, customerData.ID);
-                    foreach (var item in fr)
-                    {
-                        try
-                        {
-                            _AddresRepository.Delete(item.ID);
-                        }
-                        catch (Exception ex)
-                        {
-                            throw ex;
-                        }
-                    }
-                    foreach (CustomerAddress item in needUpdated)
-                    {
-                        try
-                        {
-                            if (item.ID > 0)
-                            {
-                                _AddresRepository.Update(item);
-                            }
-                            else
-                            {
-                                item.CustomerID = customerData.ID;
-                                _AddresRepository.Create(item);
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            throw ex;
-                        }
-                    }
-                    _AddresRepository.Save();
                     if (customerData.CustomerPhoto == null)
                     {
-                        Customer customerOldData = _CustomerRepository.FindByCondition(x => x.ID == customerData.ID).FirstOrDefault();
+                        Customer customerOldData = _CustomerRepository.GetByExpresion(x => x.ID == customerData.ID).FirstOrDefault();
                         customerData.CustomerPhoto = customerOldData.CustomerPhoto;
                     }
                     customerData.CustomerAddresses = null;
@@ -123,7 +102,7 @@ namespace CustomerInfoPortal.Repositories
                 {
                     _CustomerRepository.Create(customerData);
                 }
-                _CustomerRepository.Save();
+                _CustomerRepository.SaveChanges();
                 return customerData;
             }
             catch (Exception ex)
@@ -132,10 +111,10 @@ namespace CustomerInfoPortal.Repositories
             }
         }
 
-        public void DeleteCustomer(int id)
+        public void RemoveCustomer(int id)
         {
-            _CustomerRepository.Delete(id);
-            _CustomerRepository.Save();
+            _CustomerRepository.Remove(id);
+            _CustomerRepository.SaveChanges();
         }
         private byte[] ConvertFileToByte(IFormFile file)
         {
@@ -155,11 +134,53 @@ namespace CustomerInfoPortal.Repositories
             return fileBytes;
         }
 
-        private List<CustomerAddress> CustomerAddressSynch(List<CustomerAddress> param, int cusId)
+        private void CustomerAddressesSynchronizer(Customer customerData)
+        {
+            List<CustomerAddress> frontendNewAddress = new List<CustomerAddress>();
+            foreach (var item in customerData.CustomerAddresses)
+            {
+                frontendNewAddress.Add(item);
+            }
+
+            List<CustomerAddress> fr = CustomerOldAddresses(customerData.CustomerAddresses, customerData.ID);
+            foreach (var item in fr)
+            {
+                try
+                {
+                    _AddresRepository.Remove(item.ID);
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+            }
+            foreach (CustomerAddress item in frontendNewAddress)
+            {
+                try
+                {
+                    if (item.ID > 0)
+                    {
+                        _AddresRepository.Update(item);
+                    }
+                    else
+                    {
+                        item.CustomerID = customerData.ID;
+                        _AddresRepository.Create(item);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+            }
+            _AddresRepository.SaveChanges();
+        }
+
+        private List<CustomerAddress> CustomerOldAddresses(List<CustomerAddress> param, int cusId)
         {
             try
             {
-                List<CustomerAddress> AddressList = _AddresRepository.FindByCondition(y => y.CustomerID == cusId).ToList();
+                List<CustomerAddress> AddressList = _AddresRepository.GetByExpresion(y => y.CustomerID == cusId).ToList();
 
                 var ids = AddressList.Select(x => x.ID);
                 var pIds = param.Select(x => x.ID);

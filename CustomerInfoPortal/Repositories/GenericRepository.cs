@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace CustomerInfoPortal.Repositories
 {
-    public class GenericRepository<T> : IRepositoryBase<T> where T : class
+    public class GenericRepository<T> : IGenirecRepositoryBase<T> where T : class
     {
         private readonly CIPDbContext _context;
         private DbSet<T> table = null;
@@ -17,7 +17,7 @@ namespace CustomerInfoPortal.Repositories
             table = _context.Set<T>();
         }
 
-        public void Save()
+        public void SaveChanges()
         {
             _context.SaveChanges();
         }
@@ -27,18 +27,18 @@ namespace CustomerInfoPortal.Repositories
             table.Add(entity);
         }
 
-        public void Delete(object id)
+        public void Remove(object id)
         {
             T existing = table.Find(id);
             table.Remove(existing);
         }
 
-        public IQueryable<T> FindAll()
+        public IQueryable<T> GetAll()
         {
             return table.AsNoTracking();
         }
 
-        public IQueryable<T> FindByCondition(Expression<Func<T, bool>> expression)
+        public IQueryable<T> GetByExpresion(Expression<Func<T, bool>> expression)
         {
             return table.Where(expression).AsNoTracking();
         }

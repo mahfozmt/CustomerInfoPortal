@@ -27,6 +27,10 @@ namespace CustomerInfoPortal
             services.AddDbContext<CIPDbContext>(c => c.UseSqlServer(connectionString));
 
             services.AddControllersWithViews();
+
+            services.AddControllers()
+            .AddJsonOptions(options =>
+               options.JsonSerializerOptions.PropertyNamingPolicy = null);
             // In production, the Angular files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
             {
@@ -34,7 +38,7 @@ namespace CustomerInfoPortal
             });
 
             services.AddScoped<ICustomerService, CustomerService>();
-            services.AddScoped(typeof(IRepositoryBase<>), typeof(GenericRepository<>));
+            services.AddScoped(typeof(IGenirecRepositoryBase<>), typeof(GenericRepository<>));
 
             services.AddCors(options =>
             {

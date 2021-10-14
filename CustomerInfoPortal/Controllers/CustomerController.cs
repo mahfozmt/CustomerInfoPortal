@@ -38,19 +38,28 @@ namespace CustomerInfoPortal.Controllers
         }
 
         [HttpPost]
-        [Route("/api/Customer/SaveCustomer")]
-        public IActionResult SaveCustomer([FromForm] CustomerViewModel customerView)
+        [Route("/api/Customer/CreateCustomer")]
+        public IActionResult CreateCustomer([FromForm] CustomerViewModel customerView)
         {
             try
             {
-                if ((customerView.CustomerPhoto != null && customerView.ID == 0) || customerView.ID > 0)
+
+                if (customerView.ID > 0)
                 {
-                    Customer customer = _cusService.SaveCustomer(customerView);
+                    Customer customer = _cusService.CreateCustomer(customerView);
                     return Ok(customer);
                 }
                 else
                 {
-                    return BadRequest("Insert Image!");
+                    if (customerView.CustomerPhoto != null)
+                    {
+                        Customer customer = _cusService.CreateCustomer(customerView);
+                        return Ok(customer);
+                    }
+                    else
+                    {
+                        return BadRequest("Insert Image!");
+                    }
                 }
 
             }
@@ -78,14 +87,14 @@ namespace CustomerInfoPortal.Controllers
         }
 
         [HttpPost]
-        [Route("/api/Customer/DeleteCustomer")]
-        public IActionResult DeleteCustomer([FromForm] Customer customer)
+        [Route("/api/Customer/RemoveCustomer")]
+        public IActionResult RemoveCustomer([FromForm] Customer customer)
         {
             try
             {
                 if (customer.ID > 0)
                 {
-                    _cusService.DeleteCustomer((int)customer.ID);
+                    _cusService.RemoveCustomer((int)customer.ID);
                     return Ok();
                 }
                 else

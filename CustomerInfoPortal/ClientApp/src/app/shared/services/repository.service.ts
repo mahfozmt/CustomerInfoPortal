@@ -36,7 +36,7 @@ export class RepositoryService {
 
   createWithFile<T>(route: string, formBody: FormData) {
     if (formBody) {
-      return this.http.post<T>(this.createCompleteRoute(route, this.envUrl.urlAddress), formBody, this.generateHeaders());
+      return this.http.post<T>(this.createCompleteRoute(route, this.envUrl.urlAddress), formBody);
     }
   }
 

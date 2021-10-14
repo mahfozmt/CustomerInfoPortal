@@ -7,14 +7,16 @@ using System.Threading.Tasks;
 namespace CustomerInfoPortal.Repositories
 {
 
-    public interface IRepositoryBase<T> where T : class
+    public interface IGenirecRepositoryBase<T> where T : class
     {
-        IQueryable<T> FindAll();
-        IQueryable<T> FindByCondition(Expression<Func<T, bool>> expression);
+
         void Create(T entity);
         void Update(T entity);
-        void Delete(object id);
-        void Save();
+        void Remove(object id);
+        IQueryable<T> GetAll();
+        IQueryable<T> GetByExpresion(Expression<Func<T, bool>> expression);
+        void SaveChanges();
+
     }
 
 }

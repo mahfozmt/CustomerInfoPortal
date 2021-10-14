@@ -11,7 +11,7 @@ namespace CustomerInfoPortal.Repositories
     {
         IEnumerable<Customer> GetAllCustomer();
         Customer GetCustomerById(int id);
-        Customer SaveCustomer(CustomerViewModel customer);
-        void DeleteCustomer(int id);
+        Customer CreateCustomer(CustomerViewModel customer);
+        void RemoveCustomer(int id);
     }
 }

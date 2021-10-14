@@ -32,24 +32,25 @@ export class CustomerComponent implements OnInit {
     static: true
   }) attachedImageInput: ElementRef
 
-  constructor(private countryService: CountryService, private customerService: CustomerService, private fb: FormBuilder, private domSanitizer: DomSanitizer) { }
+  constructor(private countryService: CountryService, private customerService: CustomerService, private frombuilder: FormBuilder, private domSanitizer: DomSanitizer) { }
 
   ngOnInit(): void {
-    this.buildForm();
-    this.LoadCustomerList()
-    this.LoadCountryDDL();
+    this.createForm();
+    this.GetCustomerList()
+    this.GetCountryDropDown();
   }
-  LoadCountryDDL() {
+  GetCountryDropDown() {
     this.countryService.getAllCountry().subscribe(
       (data) => {
         this.countries = data;
+        console.log(this.countries);
       },
       (err) => {
         console.log(err);
       });
   }
 
-  LoadCustomerList() {
+  GetCustomerList() {
     this.customerService.getAllCustomers().subscribe(
       (data) => {
         this.customers = data;
@@ -89,8 +90,8 @@ export class CustomerComponent implements OnInit {
     element.click();
   }
 
-  buildForm() {
-    this.mainForm = this.fb.group({
+  createForm() {
+    this.mainForm = this.frombuilder.group({
       ID: new FormControl('0'),
       CountryID: new FormControl('0', Validators.required),
       CustomerName: new FormControl('', [Validators.required, Validators.maxLength(50)]),
@@ -98,7 +99,7 @@ export class CustomerComponent implements OnInit {
       MotherName: new FormControl('', Validators.maxLength(50)),
       MaritalStatus: new FormControl('1'),
       CustomerPhoto: new FormControl(''),
-      CustomerAddresses: this.fb.array([
+      CustomerAddresses: this.frombuilder.array([
         this.buildCustomerAddressFormArrary()
       ])
     });
@@ -108,13 +109,15 @@ export class CustomerComponent implements OnInit {
     const CustomerAddressesForm = this.buildCustomerAddressFormArrary(address);
     this.getCustomerAddresses().push(CustomerAddressesForm);
   }
+
   buildCustomerAddressFormArrary(address: CustomerAddress = new CustomerAddress()) {
-    return this.fb.group({
+    return this.frombuilder.group({
       ID: new FormControl(address.ID),
       CustomerID: new FormControl(address.CustomerID),
       Address: new FormControl(address.Address, [Validators.required, Validators.maxLength(500)])
     });
   }
+
   removeCustomerAddresses(i: number) {
     this.getCustomerAddresses().removeAt(i);
     if (i == 0) {
@@ -122,9 +125,11 @@ export class CustomerComponent implements OnInit {
       this.addCustomerAddresses();
     }
   }
+
   getCustomerAddresses(): FormArray {
     return this.mainForm.get("CustomerAddresses") as FormArray
   }
+
   onSave() {
     this.formSubmited = true;
     if (this.mainForm.valid && this.mainForm.get('CountryID').value != 0) {
@@ -152,7 +157,7 @@ export class CustomerComponent implements OnInit {
       fd.forEach((value, key) => {
         console.log(key + " " + value)
       });
-      this.customerService.saveCustomer(fd).subscribe(
+      this.customerService.CreateCustomer(fd).subscribe(
         (data) => {
           // this.notify.showSuccess('Information Saved Succesfully', 'Information');
           console.log(data);
@@ -172,9 +177,9 @@ export class CustomerComponent implements OnInit {
 
 
   resetForm() {
-    this.LoadCustomerList();
+    this.GetCustomerList();
     this.mainForm.enable();
-    this.buildForm();
+    this.createForm();
     this.selectedFile = null;
     this.applicationState = 'new';
     this.customerImageSelected = false;
@@ -184,7 +189,7 @@ export class CustomerComponent implements OnInit {
 
   loadById(id) {
     this.applicationState = 'view';
-    this.customerService.getAllCustomerById(id).subscribe(
+    this.customerService.GetCustomerById(id).subscribe(
       (data) => {
         // this.notify.showInfo('Information Loaded Succesfully', 'Information');
         console.log(data);
@@ -226,7 +231,7 @@ export class CustomerComponent implements OnInit {
       if (this.customerData.ID > 0) {
         let fd = new FormData();
         fd.append("ID", this.customerData.ID.toString());
-        this.customerService.deleteCustomer(fd).subscribe(
+        this.customerService.RemoveCustomer(fd).subscribe(
           (data) => {
             // this.notify.showSuccess('Information Ddeleted Succesfully', 'Information');
             console.log(data);
