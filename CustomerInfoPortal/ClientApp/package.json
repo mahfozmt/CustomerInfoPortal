@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "node start-for-dotnet.js",
+    "start": "node start-dotnet.js",
     "start:ng": "echo hello && ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
