@@ -37,6 +37,25 @@ img {
 legend {
   float: none !important;
 }
+
+/* Selects any disabled <input> */
+input:disabled {
+  background: #ccc;
+  opacity: 0.9;
+  cursor: not-allowed;
+}
+
+select:disabled {
+  background: #ccc;
+  opacity: 0.9;
+  cursor: not-allowed;
+}
+
+.btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed !important;
+}
+
 /*.reset-this {
   all: initial;
 }
