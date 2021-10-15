@@ -110,7 +110,7 @@
                           <img id="cusromerPhotoViwer" for="file-upload" [src]="customerPhotoUrl!= null ? customerPhotoUrl : avatarImageUrl" alt="Customer Image" />
                         </div>
                         <button [disabled]="pageMode=='view'" onclick="$('#file-upload').click()" style="width:180px;" class="btn custom-file-upload mt-1">
-                          <i class="fa fa-cloud-upload"></i> Upload Image
+                          <i class="fa fa-cloud-upload"></i> {{pageMode=='new' ? 'Upload Image':'Change Image'}}
                         </button>
                         <span class="text-danger" *ngIf="(!customerImageLoaded) && formSubmited">Please Upload Image.</span>
                         <input id="file-upload" formControlName="CustomerPhoto" name='upload_cont_img' type="file" accept="image/*" (change)="onUploadCustomerImage($event);" style="display:none;">
@@ -147,8 +147,8 @@
                                 <span class="text-danger" *ngIf="add.get('Address').errors?.maxlength">Address Can contain only 500 charecters</span>
                               </td>
                               <td>
-                                <button class="btn btn-primary btn-flat" *ngIf="pageMode=='edit' || pageMode=='new'" (click)="enableEditingAddress(i)">Edit</button> &nbsp;
-                                <button class="btn btn-danger btn-flat" *ngIf="pageMode=='edit' || pageMode=='new'" (click)="removeCustomerAddresses(i)">Delete</button>
+                                <button class="btn btn-primary btn-flat" [disabled]="pageMode=='view'" (click)="enableEditingAddress(i)">Edit</button> &nbsp;
+                                <button class="btn btn-danger btn-flat" [disabled]="pageMode=='view'" (click)="removeCustomerAddresses(i)">Delete</button>
                               </td>
                             </tr>
                           </tbody>
