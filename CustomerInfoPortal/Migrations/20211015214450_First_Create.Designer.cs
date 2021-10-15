@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CustomerInfoPortal.Migrations
 {
     [DbContext(typeof(CIPDbContext))]
-    [Migration("20211012203309_firstCreate")]
-    partial class firstCreate
+    [Migration("20211015214450_First_Create")]
+    partial class First_Create
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
