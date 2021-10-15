@@ -7,6 +7,10 @@ import { Customer } from '../Models/Customer';
 import { CustomerAddress } from '../Models/CustomerAddress';
 import { CountryService } from '../shared/services/country.service';
 import { CustomerService } from '../shared/services/customer.service';
+import { ErrorHandlerService } from '../shared/services/error-handler.service';
+import Swal from 'sweetalert2/dist/sweetalert2.js';
+
+
 
 declare var $: any;
 
@@ -16,23 +20,26 @@ declare var $: any;
   styleUrls: ['./customer.component.css']
 })
 export class CustomerComponent implements OnInit {
-
+  public customerForm: FormGroup;
+  public customerData: Customer;
   public countries: Country[] = [];
   public customers: Customer[] = [];
-  public customerPhotoUrl: any = '';
-  public selectedFileString: string;
-  public selectedFile: File;
-  public selectedFileName: string;
+  public selectedImage: File;
+  public selectedImageName: string;
+  public customerPhotoUrl: any = 'https://cdn-icons-png.flaticon.com/512/685/685686.png';
+  public selectedImageString: string;
   public customerImageSelected: boolean = false;
-  public applicationState: string = 'new';
-  public mainForm: FormGroup;
-  public customerData: Customer;
+  public pageMode: string = 'new';
   public formSubmited: boolean = false;
+  public errorMessage: string;
+  ImageExtesion = ["png", "jpeg", "jpg"];
+  public avatarImageUrl: string = 'https://cdn-icons-png.flaticon.com/512/685/685686.png';
+
   @ViewChild('attachedImageInput', {
     static: true
   }) attachedImageInput: ElementRef
 
-  constructor(private countryService: CountryService, private customerService: CustomerService, private frombuilder: FormBuilder, private domSanitizer: DomSanitizer) { }
+  constructor(private countryService: CountryService, private customerService: CustomerService, private frombuilder: FormBuilder, private domSanitizer: DomSanitizer, private errorHandler: ErrorHandlerService) { }
 
   ngOnInit(): void {
     this.createForm();
@@ -43,10 +50,11 @@ export class CustomerComponent implements OnInit {
     this.countryService.getAllCountry().subscribe(
       (data) => {
         this.countries = data;
-        console.log(this.countries);
+        //console.log(this.countries);
       },
-      (err) => {
-        console.log(err);
+      (error) => {
+        this.errorHandler.handleError(error);
+        this.errorMessage = this.errorHandler.errorMessage;
       });
   }
 
@@ -55,43 +63,17 @@ export class CustomerComponent implements OnInit {
       (data) => {
         this.customers = data;
       },
-      (err) => {
-        console.log(err);
+      (error) => {
+        this.errorHandler.handleError(error);
+        this.errorMessage = this.errorHandler.errorMessage;
       }
     )
   }
 
-  onImageSelected(event) {
-    let reader = new FileReader();
-    if (event.target.files && event.target.files.length > 0) {
-      let file: File = event.target.files[0];
-      this.selectedFile = event.target.files[0];
-      let FileIsValid: boolean = (this.AllowedExt.indexOf(file.name.split('.').pop()) != -1);
-      console.log(file.name, file.name.split('.').pop());
-      if (FileIsValid) {
-        reader.readAsDataURL(file);
-        reader.onload = (e: any) => {
-          this.selectedFileString = (reader.result as string).split(',')[1];
-          this.customerPhotoUrl = e.target.result;
-          this.selectedFileName = file.name;
-        };
-        this.customerImageSelected = true;
-      }
-      else {
-        alert('Only .jpeg, .jpg, .png Files are Allowed!');
-        this.selectedFile = null;
-      }
-    }
-  }
 
-  onImageUploadClick(event) {
-    event.preventDefault();
-    let element: HTMLElement = document.getElementById('imageInput') as HTMLElement;
-    element.click();
-  }
 
   createForm() {
-    this.mainForm = this.frombuilder.group({
+    this.customerForm = this.frombuilder.group({
       ID: new FormControl('0'),
       CountryID: new FormControl('0', Validators.required),
       CustomerName: new FormControl('', [Validators.required, Validators.maxLength(50)]),
@@ -100,17 +82,11 @@ export class CustomerComponent implements OnInit {
       MaritalStatus: new FormControl('1'),
       CustomerPhoto: new FormControl(''),
       CustomerAddresses: this.frombuilder.array([
-        this.buildCustomerAddressFormArrary()
+        this.createCustomerAddressFormArrary()
       ])
     });
   }
-
-  addCustomerAddresses(address: CustomerAddress = new CustomerAddress()) {
-    const CustomerAddressesForm = this.buildCustomerAddressFormArrary(address);
-    this.getCustomerAddresses().push(CustomerAddressesForm);
-  }
-
-  buildCustomerAddressFormArrary(address: CustomerAddress = new CustomerAddress()) {
+  createCustomerAddressFormArrary(address: CustomerAddress = new CustomerAddress()) {
     return this.frombuilder.group({
       ID: new FormControl(address.ID),
       CustomerID: new FormControl(address.CustomerID),
@@ -118,22 +94,49 @@ export class CustomerComponent implements OnInit {
     });
   }
 
+  getCustomerAddresses(): FormArray {
+    return this.customerForm.get("CustomerAddresses") as FormArray
+  }
+  addCustomerAddresses(address: CustomerAddress = new CustomerAddress()) {
+    const CustomerAddressesForm = this.createCustomerAddressFormArrary(address);
+    this.getCustomerAddresses().push(CustomerAddressesForm);
+  }
+
   removeCustomerAddresses(i: number) {
     this.getCustomerAddresses().removeAt(i);
     if (i == 0) {
       // this.notify.showWarning('You Have To Provide At Least 1 Address', 'Warnings');
+      
       this.addCustomerAddresses();
     }
   }
 
-  getCustomerAddresses(): FormArray {
-    return this.mainForm.get("CustomerAddresses") as FormArray
+  onUploadCustomerImage(event) {
+    let reader = new FileReader();
+    if (event.target.files && event.target.files.length > 0) {
+      let file: File = event.target.files[0];
+      this.selectedImage = event.target.files[0];
+      let FileIsValid: boolean = (this.ImageExtesion.indexOf(file.name.split('.').pop()) != -1);
+      if (FileIsValid) {
+        reader.readAsDataURL(file);
+        reader.onload = (e: any) => {
+          this.selectedImageString = (reader.result as string).split(',')[1];
+          this.customerPhotoUrl = e.target.result;
+          this.selectedImageName = file.name;
+        };
+        this.customerImageSelected = true;
+      }
+      else {
+        alert('Only Image Allowed!');
+        this.selectedImage = null;
+      }
+    }
   }
 
-  onSave() {
+  saveCustomer() {
     this.formSubmited = true;
-    if (this.mainForm.valid && this.mainForm.get('CountryID').value != 0) {
-      this.customerData = this.mainForm.getRawValue();
+    if (this.customerForm.valid && this.customerForm.get('CountryID').value != 0) {
+      this.customerData = this.customerForm.getRawValue();
       if ((this.customerData.ID == null || this.customerData.ID == 0) && !this.customerImageSelected) { return; }
       console.log(this.customerData);
       let fd = new FormData();
@@ -142,35 +145,41 @@ export class CustomerComponent implements OnInit {
       fd.append("ID", this.customerData.ID.toString());
       fd.append("CountryID", this.customerData.CountryID.toString());
       fd.append("CustomerName", this.customerData.CustomerName.toString());
-      fd.append("FatherName", this.customerData.FatherName.toString());
-      fd.append("MotherName", this.customerData.MotherName.toString());
+      fd.append("FatherName", this.customerData.FatherName);
+      fd.append("MotherName", this.customerData.MotherName);
       fd.append("MaritalStatus", this.customerData.MaritalStatus.toString());
       this.customerData.CustomerAddresses.forEach((item, i) => {
         fd.append(`CustomerAddresses[${i}].ID`, item.ID.toString());
         fd.append(`CustomerAddresses[${i}].CustomerID`, item.CustomerID.toString());
         fd.append(`CustomerAddresses[${i}].Address`, item.Address);
       });
-      if (this.selectedFile != null) {
-        fd.append("CustomerPhoto", this.selectedFile, this.selectedFile.name);
+      if (this.selectedImage != null) {
+        fd.append("CustomerPhoto", this.selectedImage, this.selectedImage.name);
       }
       console.log(fd);
-      fd.forEach((value, key) => {
-        console.log(key + " " + value)
-      });
+      //fd.forEach((value, key) => {
+      //  console.log(key + " " + value)
+      //});
       this.customerService.CreateCustomer(fd).subscribe(
+
         (data) => {
-          // this.notify.showSuccess('Information Saved Succesfully', 'Information');
+          console.log('Succes to subscribe Hit');
+
+          $('#successModal').modal();
           console.log(data);
           this.resetForm();
         },
-        (err) => {
-          // this.notify.showError('Error Occered!', 'Oops');
-          console.log(err);
+        (error) => {
+          console.log('Eroor To submit');
+          console.log(error);
+          this.errorHandler.handleError(error);
+          this.errorMessage = this.errorHandler.errorMessage;
         }
       )
     }
     else {
       // this.notify.showWarning('Please Provide All Required Data.', 'Warning');
+      alert('Please Provide All Required Data.');
     }
 
   }
@@ -178,22 +187,23 @@ export class CustomerComponent implements OnInit {
 
   resetForm() {
     this.GetCustomerList();
-    this.mainForm.enable();
+    this.customerForm.enable();
     this.createForm();
-    this.selectedFile = null;
-    this.applicationState = 'new';
+    this.selectedImage = null;
+    this.customerPhotoUrl = null;
+    this.pageMode = 'new';
     this.customerImageSelected = false;
     this.formSubmited = false;
     this.attachedImageInput.nativeElement.value = '';
   }
 
   loadById(id) {
-    this.applicationState = 'view';
+    this.pageMode = 'view';
     this.customerService.GetCustomerById(id).subscribe(
       (data) => {
-        // this.notify.showInfo('Information Loaded Succesfully', 'Information');
-        console.log(data);
-        this.mainForm.patchValue({
+        //$('#successModal').modal();
+        //console.log(data);
+        this.customerForm.patchValue({
           ID: data.ID,
           CountryID: data.CountryID,
           CustomerName: data.CustomerName,
@@ -212,34 +222,35 @@ export class CustomerComponent implements OnInit {
         data.CustomerAddresses.forEach((add, i) => {
           this.addCustomerAddresses(add);
         })
-        this.mainForm.disable();
+        this.customerForm.disable();
       },
-      (err) => {
-        // this.notify.showError('Error Occered!', 'Oops');
-        console.log(err);
+      (error) => {
+        this.errorHandler.handleError(error);
+        this.errorMessage = this.errorHandler.errorMessage;
       }
     )
   }
+
   editModeOpen() {
-    this.applicationState = 'edit';
-    this.mainForm.enable();
+    this.pageMode = 'edit';
+    this.customerForm.enable();
   }
 
   deleteCustomer() {
-    this.customerData = this.mainForm.getRawValue();
-    if (confirm('Are You Sure About Delete This Record?')) {
+    this.customerData = this.customerForm.getRawValue();
+    if (confirm('Are You Sure To Delete?')) {
       if (this.customerData.ID > 0) {
         let fd = new FormData();
         fd.append("ID", this.customerData.ID.toString());
         this.customerService.RemoveCustomer(fd).subscribe(
           (data) => {
-            // this.notify.showSuccess('Information Ddeleted Succesfully', 'Information');
+            $('#successModal').modal();
             console.log(data);
             this.resetForm();
           },
-          (err) => {
-            // this.notify.showError('Error Occered!', 'Oops');
-            console.log(err);
+          (error) => {
+            this.errorHandler.handleError(error);
+            this.errorMessage = this.errorHandler.errorMessage;
           });
       }
       else {
@@ -252,5 +263,34 @@ export class CustomerComponent implements OnInit {
     this.getCustomerAddresses().controls[i].enable;
   }
 
-  AllowedExt = ["png", "jpeg", "jpg"];
+
+  alertWithSuccess() {
+    Swal.fire('Thank you...', 'You submitted succesfully!', 'success')
+  }
+
+  confirmBox() {
+    Swal.fire({
+      title: 'Are you sure want to remove?',
+      text: 'You will not be able to recover this file!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'No, keep it'
+    }).then((result) => {
+      if (result.value) {
+        Swal.fire(
+          'Deleted!',
+          'Your imaginary file has been deleted.',
+          'success'
+        )
+      } else if (result.dismiss === Swal.DismissReason.cancel) {
+        Swal.fire(
+          'Cancelled',
+          'Your imaginary file is safe :)',
+          'error'
+        )
+      }
+    })
+  }
+
 }

@@ -23,12 +23,12 @@ namespace CustomerInfoPortal.Controllers
         }
 
         [HttpGet]
-        [Route("/api/Customer/GetCustomerList")]
-        public IActionResult GetCustomerList()
+        [Route("/api/Customer/GetAllCustomers")]
+        public IActionResult GetAllCustomers()
         {
             try
             {
-                return Ok(_cusService.GetAllCustomer().ToList());
+                return Ok(_cusService.GetAllCustomers().ToList());
             }
             catch (Exception ex)
             {
@@ -47,6 +47,7 @@ namespace CustomerInfoPortal.Controllers
                 if (customerView.ID > 0)
                 {
                     Customer customer = _cusService.CreateCustomer(customerView);
+                    customer.CustomerAddresses = null;
                     return Ok(customer);
                 }
                 else
@@ -54,6 +55,7 @@ namespace CustomerInfoPortal.Controllers
                     if (customerView.CustomerPhoto != null)
                     {
                         Customer customer = _cusService.CreateCustomer(customerView);
+                        customer.CustomerAddresses = null;
                         return Ok(customer);
                     }
                     else

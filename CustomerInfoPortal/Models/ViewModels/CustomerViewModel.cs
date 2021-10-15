@@ -16,9 +16,10 @@ namespace CustomerInfoPortal.Models.ViewModels
         public string MotherName { get; set; }
         public int MaritalStatus { get; set; }
         public IFormFile CustomerPhoto { get; set; }
+
+
         public Country Country { get; set; }
         public List<CustomerAddress> CustomerAddresses { get; set; }
-
 
     }
 }

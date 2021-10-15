@@ -9,7 +9,7 @@ namespace CustomerInfoPortal.Repositories
 {
   public interface ICustomerService
     {
-        IEnumerable<Customer> GetAllCustomer();
+        IEnumerable<Customer> GetAllCustomers();
         Customer GetCustomerById(int id);
         Customer CreateCustomer(CustomerViewModel customer);
         void RemoveCustomer(int id);

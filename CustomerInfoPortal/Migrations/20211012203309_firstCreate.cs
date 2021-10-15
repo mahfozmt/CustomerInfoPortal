@@ -13,7 +13,7 @@ namespace CustomerInfoPortal.Migrations
                 {
                     ID = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    CountryName = table.Column<string>(type: "NVARCHAR(50)", nullable: true)
+                    CountryName = table.Column<string>(type: "nvarchar(50)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -27,11 +27,11 @@ namespace CustomerInfoPortal.Migrations
                     ID = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     CountryID = table.Column<int>(nullable: false),
-                    CustomerName = table.Column<string>(type: "NVARCHAR(100)", nullable: true),
-                    FatherName = table.Column<string>(type: "NVARCHAR(100)", nullable: true),
-                    MotherName = table.Column<string>(type: "NVARCHAR(100)", maxLength: 100, nullable: true),
+                    CustomerName = table.Column<string>(type: "nvarchar(100)", nullable: true),
+                    FatherName = table.Column<string>(type: "nvarchar(100)", nullable: true),
+                    MotherName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     MaritalStatus = table.Column<int>(nullable: false),
-                    CustomerPhoto = table.Column<byte[]>(type: "VARBINARY(MAX)", nullable: true)
+                    CustomerPhoto = table.Column<byte[]>(type: "varbinary(MAX)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -51,7 +51,7 @@ namespace CustomerInfoPortal.Migrations
                     ID = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     CustomerID = table.Column<int>(nullable: false),
-                    CustomerAddress = table.Column<string>(type: "NVARCHAR(500)", nullable: true)
+                    CustomerAddress = table.Column<string>(type: "nvarchar(500)", nullable: true)
                 },
                 constraints: table =>
                 {

@@ -10,10 +10,7 @@ namespace CustomerInfoPortal
     public class CIPDbContext:DbContext
     {
         private readonly DbContextOptions _options;
-        public CIPDbContext(DbContextOptions options) : base(options)
-        {
-            _options = options;
-        }
+        public CIPDbContext(DbContextOptions options) : base(options) {_options = options; }
 
         public DbSet<Country> Country { get; set; }
         public DbSet<Customer> Customer { get; set; }

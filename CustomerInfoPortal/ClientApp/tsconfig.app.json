@@ -6,7 +6,7 @@
     "types": [
       "jquery",
       "bootstrap",
-      "jqueryui"
+      //"jqueryui"
     ]
   },
   "files": [

@@ -12,15 +12,15 @@ namespace CustomerInfoPortal.Models
         public int ID { get; set; }
         [ForeignKey("Country")]
         public int CountryID { get; set; }
-        [Column(TypeName = "NVARCHAR(100)")]
+        [Column(TypeName = "nvarchar(100)")]
         public string CustomerName { get; set; }
-        [Column(TypeName = "NVARCHAR(100)")]
+        [Column(TypeName = "nvarchar(100)")]
         public string FatherName { get; set; }
-        [Column(TypeName = "NVARCHAR(100)")]
+        [Column(TypeName = "nvarchar(100)")]
         [StringLength(100)]
         public string MotherName { get; set; }
         public int MaritalStatus { get; set; }
-        [Column(TypeName = "VARBINARY(MAX)")]
+        [Column(TypeName = "varbinary(MAX)")]
         public byte[] CustomerPhoto { get; set; }
 
         //Nav

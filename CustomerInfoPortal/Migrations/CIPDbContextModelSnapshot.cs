@@ -27,7 +27,7 @@ namespace CustomerInfoPortal.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("CountryName")
-                        .HasColumnType("NVARCHAR(50)");
+                        .HasColumnType("nvarchar(50)");
 
                     b.HasKey("ID");
 
@@ -62,19 +62,19 @@ namespace CustomerInfoPortal.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("CustomerName")
-                        .HasColumnType("NVARCHAR(100)");
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<byte[]>("CustomerPhoto")
-                        .HasColumnType("VARBINARY(MAX)");
+                        .HasColumnType("varbinary(MAX)");
 
                     b.Property<string>("FatherName")
-                        .HasColumnType("NVARCHAR(100)");
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<int>("MaritalStatus")
                         .HasColumnType("int");
 
                     b.Property<string>("MotherName")
-                        .HasColumnType("NVARCHAR(100)")
+                        .HasColumnType("nvarchar(100)")
                         .HasMaxLength(100);
 
                     b.HasKey("ID");
@@ -93,7 +93,7 @@ namespace CustomerInfoPortal.Migrations
 
                     b.Property<string>("Address")
                         .HasColumnName("CustomerAddress")
-                        .HasColumnType("NVARCHAR(500)");
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<int>("CustomerID")
                         .HasColumnType("int");

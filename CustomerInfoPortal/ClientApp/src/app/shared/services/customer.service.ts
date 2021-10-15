@@ -14,24 +14,25 @@ export class CustomerService {
 
  
   getAllCustomers(): Observable<Customer[]> {
-    let route = 'api/Customer/GetCustomerList';
+    let route = 'api/Customer/GetAllCustomers';
     return this.repo.getData<Customer[]>(route);
+  }
+
+  GetCustomerById(id): Observable<Customer> {
+    let route = 'api/Customer/GetCustomerById?id=' + id;
+    return this.repo.getData<Customer>(route);
   }
 
   CreateCustomer(customer: FormData): Observable<Customer> {
     let route = 'api/Customer/CreateCustomer';
-    return this.repo.createWithFile<Customer>(route, customer);
+    var serverCus = this.repo.createWithFile<Customer>(route, customer);
+    return serverCus;
   }
 
   RemoveCustomer(customer: FormData): Observable<Customer> {
   let route = 'api/Customer/RemoveCustomer';
   return this.repo.createWithFile<Customer>(route, customer);
-}
-
-GetCustomerById(id): Observable<Customer> {
-  let route = 'api/Customer/GetCustomerById?id='+id;
-  return this.repo.getData<Customer>(route);
-}   
+  }
 
 }
 

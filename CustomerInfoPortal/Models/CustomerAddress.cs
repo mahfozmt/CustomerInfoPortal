@@ -11,7 +11,7 @@ namespace CustomerInfoPortal.Models
         public int ID { get; set; }
         [ForeignKey("Customer")]
         public int CustomerID { get; set; }
-        [Column(name:"CustomerAddress",TypeName = "NVARCHAR(500)")]
+        [Column(name:"CustomerAddress",TypeName = "nvarchar(500)")]
         public string Address { get; set; }
 
         //Nav

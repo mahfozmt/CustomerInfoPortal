@@ -3,3 +3,7 @@
     font-style: italic;
     color: #fff;
 }
+
+.navbar-brand{
+    padding-left:6px;
+}

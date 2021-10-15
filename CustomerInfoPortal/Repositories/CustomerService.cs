@@ -25,7 +25,7 @@ namespace CustomerInfoPortal.Repositories
 
 
 
-        public IEnumerable<Customer> GetAllCustomer()
+        public IEnumerable<Customer> GetAllCustomers()
         {
             try
             {
@@ -63,8 +63,8 @@ namespace CustomerInfoPortal.Repositories
                     ID = customerViewModel.ID == null ? 0 : (int)customerViewModel.ID,
                     CountryID = customerViewModel.CountryID,
                     CustomerName = customerViewModel.CustomerName,
-                    FatherName = customerViewModel.FatherName,
-                    MotherName = customerViewModel.MotherName,
+                    FatherName = customerViewModel.FatherName == null ?"" : customerViewModel.FatherName,
+                    MotherName = customerViewModel.MotherName == null ? "" : customerViewModel.MotherName,
                     MaritalStatus = customerViewModel.MaritalStatus,
                     //CustomerPhoto= 
                     Country = customerViewModel.Country,

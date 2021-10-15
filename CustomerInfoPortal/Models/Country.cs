@@ -8,7 +8,7 @@ namespace CustomerInfoPortal.Models
     {
         [Key]
         public int ID { get; set; }
-        [Column(TypeName = "NVARCHAR(50)")]
+        [Column(TypeName = "nvarchar(50)")]
         public string CountryName { get; set; }
 
         //Nav
